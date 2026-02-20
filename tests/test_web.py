@@ -17,11 +17,11 @@ def client():
         yield c
 
 
-def _upload(client, csv_path, theme="dark", fmt="pptx"):
+def _upload(client, csv_path, theme="dark", fmt="pptx", upload_name="upload.csv"):
     """Helper: POST /generate with a CSV file and options."""
     with open(csv_path, "rb") as f:
         data = {
-            "file": (f, "upload.csv"),
+            "file": (f, upload_name),
             "theme": theme,
             "format": fmt,
         }
@@ -125,6 +125,18 @@ class TestGenerateZip:
     def test_zip_light_theme(self, client, sample_csv_path):
         resp = _upload(client, sample_csv_path, fmt="zip")
         assert resp.status_code == 200
+
+
+class TestDownloadFilename:
+    def test_pptx_filename(self, client, sample_csv_path):
+        resp = _upload(client, sample_csv_path, fmt="pptx", upload_name="pack123.csv")
+        assert resp.status_code == 200
+        assert "pack123_pres.pptx" in resp.headers["Content-Disposition"]
+
+    def test_zip_filename(self, client, sample_csv_path):
+        resp = _upload(client, sample_csv_path, fmt="zip", upload_name="spring_awards.csv")
+        assert resp.status_code == 200
+        assert "spring_awards_pres.zip" in resp.headers["Content-Disposition"]
 
 
 class TestDefaultFormat:

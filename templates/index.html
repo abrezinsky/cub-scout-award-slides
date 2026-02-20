@@ -147,6 +147,13 @@
   .status.error { color: #c0392b; }
   .status.success { color: #27ae60; }
 
+  .privacy {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 1.5rem;
+  }
+
   .spinner {
     display: inline-block;
     width: 18px;
@@ -165,7 +172,7 @@
 <body>
 <div class="card">
   <h1>Cub Scout Award Presentation</h1>
-  <p class="subtitle">Upload a Scoutbook CSV to generate an award presentation</p>
+  <p class="subtitle">Upload your Purchase Order CSV from Scoutbook Plus (found on the Purchase Order screen via the "Download CSV" button)</p>
 
   <!-- Drop zone -->
   <div class="drop-zone" id="drop-zone">
@@ -199,6 +206,9 @@
 
   <!-- Status -->
   <div class="status" id="status"></div>
+
+  <!-- Privacy -->
+  <p class="privacy">Your data is private. Uploaded files are processed in memory and immediately discarded — nothing is stored on our servers.</p>
 </div>
 
 <script>
@@ -291,11 +301,15 @@
       }
 
       const blob = await resp.blob();
-      const ext = format === "pptx" ? "pptx" : "zip";
+      // Use server-provided filename from Content-Disposition, or fallback
+      var dlName = "awards." + (format === "pptx" ? "pptx" : "zip");
+      var cd = resp.headers.get("Content-Disposition") || "";
+      var match = cd.match(/filename="?([^";\n]+)"?/);
+      if (match) dlName = match[1];
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "awards." + ext;
+      a.download = dlName;
       document.body.appendChild(a);
       a.click();
       a.remove();

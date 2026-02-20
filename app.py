@@ -44,6 +44,11 @@ def generate():
     fmt = request.form.get("format", "pptx")
     light = theme == "light"
 
+    # Derive download name from uploaded filename (strip .csv, add _pres)
+    stem = os.path.splitext(file.filename)[0]
+    ext = "pptx" if fmt == "pptx" else "zip"
+    download_name = f"{stem}_pres.{ext}"
+
     # --- Save CSV to temp file (load_csv expects a path) ---
     try:
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
@@ -58,9 +63,9 @@ def generate():
         download_images(sorted_scouts, SKU_MAP, IMAGES_DIR)
 
         if fmt == "pptx":
-            return _generate_pptx_response(sorted_scouts, light)
+            return _generate_pptx_response(sorted_scouts, light, download_name)
         else:
-            return _generate_zip_response(sorted_scouts, light)
+            return _generate_zip_response(sorted_scouts, light, download_name)
 
     except Exception as e:
         return jsonify(error=str(e)), 500
@@ -71,7 +76,7 @@ def generate():
             pass
 
 
-def _generate_pptx_response(sorted_scouts, light):
+def _generate_pptx_response(sorted_scouts, light, download_name):
     """Generate PPTX and return as download."""
     with tempfile.NamedTemporaryFile(suffix=".pptx", delete=False) as tmp:
         tmp_pptx = tmp.name
@@ -92,11 +97,11 @@ def _generate_pptx_response(sorted_scouts, light):
         buf,
         mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
         as_attachment=True,
-        download_name="awards.pptx",
+        download_name=download_name,
     )
 
 
-def _generate_zip_response(sorted_scouts, light):
+def _generate_zip_response(sorted_scouts, light, download_name):
     """Generate ZIP of PNGs and return as download."""
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -113,7 +118,7 @@ def _generate_zip_response(sorted_scouts, light):
         buf,
         mimetype="application/zip",
         as_attachment=True,
-        download_name="awards.zip",
+        download_name=download_name,
     )
 
 
