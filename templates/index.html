@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cub Scout Award Presentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    padding: 2.5rem;
+  }
+
+  h1 {
+    text-align: center;
+    color: #003F87;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+
+  /* --- Drop zone --- */
+  .drop-zone {
+    border: 2px dashed #003F87;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    margin-bottom: 1.5rem;
+    color: #003F87;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    background: #e8f0fe;
+    border-color: #FFC72C;
+  }
+
+  .drop-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .drop-zone .label { font-weight: 600; }
+  .drop-zone .hint { font-size: 0.85rem; color: #888; margin-top: 0.25rem; }
+  .drop-zone .filename {
+    font-weight: 600;
+    color: #003F87;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
+  #file-input { display: none; }
+
+  /* --- Options row --- */
+  .options {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .option-group label.group-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 0.4rem;
+  }
+
+  .radio-row { display: flex; gap: 0.5rem; }
+
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .radio-row input { display: none; }
+
+  .radio-row input:checked + span {
+    color: #003F87;
+    font-weight: 600;
+  }
+
+  .radio-row label:has(input:checked) {
+    border-color: #003F87;
+    background: #e8f0fe;
+  }
+
+  /* --- Generate button --- */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #003F87;
+    color: #FFC72C;
+    transition: opacity 0.2s;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn:not(:disabled):hover { opacity: 0.85; }
+
+  /* --- Status --- */
+  .status {
+    text-align: center;
+    margin-top: 1rem;
+    min-height: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .status.error { color: #c0392b; }
+  .status.success { color: #27ae60; }
+
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid #003F87;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.4rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Cub Scout Award Presentation</h1>
+  <p class="subtitle">Upload a Scoutbook CSV to generate an award presentation</p>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    <div class="icon">&#128194;</div>
+    <div class="label">Drop CSV file here or click to browse</div>
+    <div class="hint">.csv files only</div>
+    <div class="filename" id="filename"></div>
+  </div>
+  <input type="file" id="file-input" accept=".csv">
+
+  <!-- Options -->
+  <div class="options">
+    <div class="option-group">
+      <label class="group-label">Theme</label>
+      <div class="radio-row">
+        <label><input type="radio" name="theme" value="dark" checked><span>Dark</span></label>
+        <label><input type="radio" name="theme" value="light"><span>Light</span></label>
+      </div>
+    </div>
+    <div class="option-group">
+      <label class="group-label">Format</label>
+      <div class="radio-row">
+        <label><input type="radio" name="format" value="pptx" checked><span>PowerPoint</span></label>
+        <label><input type="radio" name="format" value="zip"><span>ZIP (PNGs)</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <button class="btn" id="generate-btn" disabled>Generate Presentation</button>
+
+  <!-- Status -->
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+(function () {
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input");
+  const filenameEl = document.getElementById("filename");
+  const btn = document.getElementById("generate-btn");
+  const statusEl = document.getElementById("status");
+
+  let selectedFile = null;
+
+  // --- Drop zone interactions ---
+  dropZone.addEventListener("click", () => fileInput.click());
+
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+  });
+
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) selectFile(files[0]);
+  });
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) selectFile(fileInput.files[0]);
+  });
+
+  function selectFile(file) {
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      showStatus("Please select a .csv file", "error");
+      return;
+    }
+    selectedFile = file;
+    filenameEl.textContent = file.name;
+    btn.disabled = false;
+    showStatus("", "");
+  }
+
+  // --- Status display (safe DOM methods, no innerHTML) ---
+  function showStatus(text, cls) {
+    statusEl.textContent = "";
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    if (text) statusEl.textContent = text;
+  }
+
+  function showSpinner(text) {
+    statusEl.textContent = "";
+    statusEl.className = "status";
+    var spinner = document.createElement("span");
+    spinner.className = "spinner";
+    statusEl.appendChild(spinner);
+    statusEl.appendChild(document.createTextNode(" " + text));
+  }
+
+  // --- Generate ---
+  btn.addEventListener("click", async () => {
+    if (!selectedFile) return;
+
+    const theme = document.querySelector('input[name="theme"]:checked').value;
+    const format = document.querySelector('input[name="format"]:checked').value;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("theme", theme);
+    formData.append("format", format);
+
+    btn.disabled = true;
+    showSpinner("Generating presentation\u2026");
+
+    try {
+      const resp = await fetch("/generate", { method: "POST", body: formData });
+
+      if (!resp.ok) {
+        let msg = "Generation failed";
+        try {
+          const data = await resp.json();
+          if (data.error) msg = data.error;
+        } catch (_) {}
+        showStatus(msg, "error");
+        btn.disabled = false;
+        return;
+      }
+
+      const blob = await resp.blob();
+      const ext = format === "pptx" ? "pptx" : "zip";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "awards." + ext;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showStatus("Download started!", "success");
+    } catch (err) {
+      showStatus("Network error: " + err.message, "error");
+    }
+    btn.disabled = false;
+  });
+})();
+</script>
+</body>
+</html>

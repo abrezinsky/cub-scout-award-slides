@@ -23,3 +23,8 @@ run = "python generate_awards.py"
 description = "Run tests excluding slow golden-file comparisons"
 depends = ["install"]
 run = 'pytest tests/ -v -m "not slow"'
+
+[tasks.serve]
+description = "Run web app locally"
+depends = ["install"]
+run = "python app.py"

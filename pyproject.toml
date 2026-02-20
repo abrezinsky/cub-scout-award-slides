@@ -6,10 +6,12 @@ requires-python = ">=3.9"
 dependencies = [
     "Pillow>=9.0",
     "python-pptx>=0.6",
+    "Flask>=3.0",
 ]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
+serve = ["gunicorn>=21.0"]
 
 [tool.setuptools.packages.find]
 include = ["scout_awards*"]
