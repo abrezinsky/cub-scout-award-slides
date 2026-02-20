@@ -1,6 +1,7 @@
 [project]
 name = "scout-awards"
 version = "0.1.0"
+license = "MIT"
 requires-python = ">=3.9"
 dependencies = [
     "Pillow>=9.0",
