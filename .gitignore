@@ -2,4 +2,7 @@ output/
 images/sku_*.png
 __pycache__/
 *.pyc
+*.egg-info/
 .claude/
+.venv/
+.pytest_cache/

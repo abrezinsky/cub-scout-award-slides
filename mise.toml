@@ -1,0 +1,19 @@
+[tools]
+python = "3.11"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[tasks.install]
+description = "Install package in editable mode with test deps"
+run = "pip install -e '.[test]'"
+
+[tasks.test]
+description = "Run test suite"
+depends = ["install"]
+run = "pytest tests/ -v"
+
+[tasks."test:fast"]
+description = "Run tests excluding slow golden-file comparisons"
+depends = ["install"]
+run = 'pytest tests/ -v -m "not slow"'
