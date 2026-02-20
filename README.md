@@ -4,30 +4,41 @@ Generate broadcast-quality 1920x1080 PNG award certificates for Cub Scout Blue a
 
 Each scout gets a single slide showing their name, den, rank logo, and all earned awards with badge images downloaded automatically from the BSA CDN.
 
-![Example output](example.png)
+![Example output](tests/golden/tigers_Smith_Tom.png)
 
-## Requirements
+## Quick Start
 
-- Python 3.8+
-- [Pillow](https://pillow.readthedocs.io/) (`pip install Pillow`)
-- Impact font (falls back to DejaVu Sans Bold if unavailable)
+This project uses [mise](https://mise.jdx.dev/) to manage Python, the virtualenv, and tasks.
 
 ```bash
-pip install -r requirements.txt
+mise install        # install Python 3.11
+mise run install    # create venv and install dependencies
+mise run run -- sample.csv -o output/ -p awards.pptx
+```
+
+### Tasks
+
+| Task | Command | Description |
+|------|---------|-------------|
+| install | `mise run install` | Install package in editable mode with all deps |
+| run | `mise run run -- <csv> [options]` | Generate award certificates |
+| test | `mise run test` | Run full test suite (40 tests) |
+| test:fast | `mise run test:fast` | Run tests excluding slow golden-file comparisons |
+
+### Manual Setup (without mise)
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e '.[test]'
+python3 generate_awards.py sample.csv
 ```
 
 ## Usage
 
 ```bash
-python3 generate_awards.py <purchase_order.csv>
-python3 generate_awards.py <purchase_order.csv> -o <output_dir>
-python3 generate_awards.py <purchase_order.csv> -p awards.pptx
-```
-
-Try with the included sample data:
-
-```bash
-python3 generate_awards.py sample.csv
+mise run run -- <purchase_order.csv>
+mise run run -- <purchase_order.csv> -o <output_dir>
+mise run run -- <purchase_order.csv> -p awards.pptx
 ```
 
 Options:
@@ -92,3 +103,12 @@ Place rank logo PNGs in `images/` with these names:
 ## Award Images
 
 `award_images.json` maps SKUs to badge image URLs. Badge images are automatically downloaded and cached in `images/sku_<SKU>.png` on first run. If a SKU is missing from the JSON, a circular placeholder is generated.
+
+## Testing
+
+```bash
+mise run test          # full suite (40 tests, ~2s)
+mise run test:fast     # skip golden-file pixel regression
+```
+
+Tests live in `tests/` alongside sample data (`sample.csv`) and golden reference images (`tests/golden/`). The golden-file tests generate certificates from sample data and compare pixel-for-pixel against the reference PNGs.

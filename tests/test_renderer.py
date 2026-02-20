@@ -8,9 +8,8 @@ from PIL import Image
 from scout_awards.data import load_csv, sort_scouts
 from scout_awards.renderer import generate_pptx, generate_scout_image
 
-# Project root for locating golden files
-PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir))
-GOLDEN_DIR = os.path.join(PROJECT_ROOT, "test")
+TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+GOLDEN_DIR = os.path.join(TESTS_DIR, "golden")
 
 
 class TestGenerateScoutImage:
@@ -53,7 +52,7 @@ class TestGoldenFileRegression:
 
     def _golden_files(self):
         """Return list of (scout, golden_path) tuples from sample.csv."""
-        csv_path = os.path.join(PROJECT_ROOT, "sample.csv")
+        csv_path = os.path.join(TESTS_DIR, "sample.csv")
         scouts = sort_scouts(load_csv(csv_path))
         pairs = []
         for scout in scouts:

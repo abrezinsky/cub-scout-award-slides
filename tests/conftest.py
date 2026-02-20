@@ -6,14 +6,15 @@ import os
 
 import pytest
 
-# Resolve project root (one level up from tests/)
-PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir))
+# tests/ directory
+TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.normpath(os.path.join(TESTS_DIR, os.pardir))
 
 
 @pytest.fixture
 def sample_csv_path():
-    """Path to the real sample.csv shipped with the project."""
-    return os.path.join(PROJECT_ROOT, "sample.csv")
+    """Path to the real sample.csv in tests/."""
+    return os.path.join(TESTS_DIR, "sample.csv")
 
 
 @pytest.fixture

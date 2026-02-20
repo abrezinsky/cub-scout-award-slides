@@ -13,6 +13,12 @@ description = "Run test suite"
 depends = ["install"]
 run = "pytest tests/ -v"
 
+[tasks.run]
+description = "Generate award certificates"
+depends = ["install"]
+raw = true
+run = "python generate_awards.py"
+
 [tasks."test:fast"]
 description = "Run tests excluding slow golden-file comparisons"
 depends = ["install"]
