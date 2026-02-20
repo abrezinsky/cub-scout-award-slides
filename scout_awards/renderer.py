@@ -7,11 +7,11 @@ from PIL import Image, ImageDraw, ImageFont
 from .config import (
     BAR_HEIGHT, BG_COLOR, BODY_BOTTOM, BODY_TOP, FONT_BOLD, FONT_IMPACT,
     HEADER_AREA_HEIGHT, HEADER_AREA_TOP, HEIGHT, RANK_COLORS, RANK_DISPLAY,
-    SIDE_MARGIN, WIDTH, clean_award_name,
+    SIDE_MARGIN, TEXT_COLOR, TEXT_COLOR_LIGHT, WIDTH, clean_award_name,
 )
 
 
-def generate_scout_image(scout, images_dir):
+def generate_scout_image(scout, images_dir, light=False):
     """Generate a 1920x1080 PNG for one scout.
 
     Layout: each award is a horizontal row — small badge on left, large
@@ -21,7 +21,8 @@ def generate_scout_image(scout, images_dir):
     den_type = scout["den_type"]
     colors = RANK_COLORS.get(den_type, RANK_COLORS["wolves"])
     primary = colors["primary"]
-    bg = colors.get("bg", BG_COLOR)
+    bg = colors.get("bg_light" if light else "bg", BG_COLOR)
+    text_color = TEXT_COLOR_LIGHT if light else TEXT_COLOR
 
     img = Image.new("RGB", (WIDTH, HEIGHT), bg)
     draw = ImageDraw.Draw(img)
@@ -36,7 +37,7 @@ def generate_scout_image(scout, images_dir):
     full_name = f"{scout['first']} {scout['last']}".upper()
     name_x = SIDE_MARGIN
     name_y = HEADER_AREA_TOP + 5
-    draw.text((name_x, name_y), full_name, fill="white", font=name_font)
+    draw.text((name_x, name_y), full_name, fill=text_color, font=name_font)
 
     # --- Den info (left-aligned, below name with spacing) ---
     info_font = ImageFont.truetype(FONT_BOLD, 32)
@@ -86,7 +87,10 @@ def generate_scout_image(scout, images_dir):
         feat_cy = body_top + feat_padding + feat_img_h // 2
 
         # Draw full-width colored band behind featured section
-        band_color = tuple(min(255, c + 30) for c in bg)
+        if light:
+            band_color = tuple(max(0, c - 20) for c in bg)
+        else:
+            band_color = tuple(min(255, c + 30) for c in bg)
         draw.rectangle([0, body_top, WIDTH, body_top + featured_height], fill=band_color)
         # Accent line at top and bottom of band
         draw.rectangle([0, body_top, WIDTH, body_top + 3], fill=primary)
@@ -114,7 +118,7 @@ def generate_scout_image(scout, images_dir):
             bbox = draw.textbbox((0, 0), display_name, font=feat_font)
             lw = bbox[2] - bbox[0]
             label_y = feat_cy + feat_img_h // 2 + 8
-            draw.text((cx - lw // 2, label_y), display_name, fill="white", font=feat_font)
+            draw.text((cx - lw // 2, label_y), display_name, fill=text_color, font=feat_font)
 
             feat_x += fi["item_w"] + feat_gap
 
@@ -179,7 +183,7 @@ def generate_scout_image(scout, images_dir):
         bbox = draw.textbbox((0, 0), display_name, font=text_font)
         text_h = bbox[3] - bbox[1]
         text_y = row_cy - text_h // 2 - 2
-        draw.text((text_x, text_y), display_name, fill="white", font=text_font)
+        draw.text((text_x, text_y), display_name, fill=text_color, font=text_font)
 
     # --- Rank logo (right-aligned in header, drawn last so it's on top) ---
     logo_file = colors.get("logo")
@@ -199,7 +203,7 @@ def generate_scout_image(scout, images_dir):
     return img
 
 
-def generate_pptx(pptx_path, sorted_scouts, images_dir):
+def generate_pptx(pptx_path, sorted_scouts, images_dir, light=False):
     """Generate a PowerPoint with native shapes/text/images, one slide per scout."""
     from pptx import Presentation
     from pptx.util import Emu
@@ -213,12 +217,12 @@ def generate_pptx(pptx_path, sorted_scouts, images_dir):
 
     for scout in sorted_scouts:
         slide = prs.slides.add_slide(blank_layout)
-        _render_scout_slide(slide, scout, EMU_PX, images_dir)
+        _render_scout_slide(slide, scout, EMU_PX, images_dir, light=light)
 
     prs.save(pptx_path)
 
 
-def _render_scout_slide(slide, scout, EMU_PX, images_dir):
+def _render_scout_slide(slide, scout, EMU_PX, images_dir, light=False):
     """Render one scout's certificate as native PPTX shapes on a slide."""
     from pptx.util import Emu, Pt
     from pptx.dml.color import RGBColor
@@ -277,7 +281,8 @@ def _render_scout_slide(slide, scout, EMU_PX, images_dir):
     den_type = scout["den_type"]
     colors = RANK_COLORS.get(den_type, RANK_COLORS["wolves"])
     primary = colors["primary"]
-    bg = colors.get("bg", BG_COLOR)
+    bg = colors.get("bg_light" if light else "bg", BG_COLOR)
+    text_color = TEXT_COLOR_LIGHT if light else TEXT_COLOR
     rank_name = RANK_DISPLAY.get(den_type, den_type.title())
 
     # --- Slide background ---
@@ -293,7 +298,7 @@ def _render_scout_slide(slide, scout, EMU_PX, images_dir):
     full_name = f"{scout['first']} {scout['last']}".upper()
     name_y = HEADER_AREA_TOP + 5
     add_text(SIDE_MARGIN, name_y, WIDTH - 2 * SIDE_MARGIN, 100,
-             full_name, "Impact", 90, (255, 255, 255))
+             full_name, "Impact", 90, text_color)
 
     # --- Den info ---
     den_info = f"{rank_name}  \u2022  Den {scout['den_number']}"
@@ -340,7 +345,10 @@ def _render_scout_slide(slide, scout, EMU_PX, images_dir):
         feat_cy = body_top + feat_padding + feat_img_h // 2
 
         # Band + accent lines
-        band_color = tuple(min(255, c + 30) for c in bg)
+        if light:
+            band_color = tuple(max(0, c - 20) for c in bg)
+        else:
+            band_color = tuple(min(255, c + 30) for c in bg)
         add_rect(0, body_top, WIDTH, featured_height, band_color)
         add_rect(0, body_top, WIDTH, 3, primary)
         add_rect(0, body_top + featured_height - 3, WIDTH, 3, primary)
@@ -356,7 +364,7 @@ def _render_scout_slide(slide, scout, EMU_PX, images_dir):
             display_name = clean_award_name(award["item_name"])
             label_y = feat_cy + feat_img_h // 2 + 8
             add_text(feat_x, label_y, fi["item_w"], 35,
-                     display_name, "Arial", 28, (255, 255, 255),
+                     display_name, "Arial", 28, text_color,
                      bold=True, align=PP_ALIGN.CENTER)
 
             feat_x += fi["item_w"] + feat_gap
@@ -402,7 +410,7 @@ def _render_scout_slide(slide, scout, EMU_PX, images_dir):
             text_h = text_font_size + 10
             text_y = row_cy - text_h // 2
             add_text(text_x, text_y, text_w, text_h,
-                     display_name, "Arial", text_font_size, (255, 255, 255),
+                     display_name, "Arial", text_font_size, text_color,
                      bold=True)
 
     # --- Rank logo (last so it's on top) ---

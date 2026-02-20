@@ -10,6 +10,8 @@ IMAGES_DIR = os.path.normpath(IMAGES_DIR)
 # --- Layout constants ---
 WIDTH, HEIGHT = 1920, 1080
 BG_COLOR = (26, 26, 46)  # dark navy
+TEXT_COLOR = (255, 255, 255)
+TEXT_COLOR_LIGHT = (30, 30, 30)
 BAR_HEIGHT = 15
 HEADER_AREA_TOP = BAR_HEIGHT + 20
 HEADER_AREA_HEIGHT = 140
@@ -20,12 +22,12 @@ SIDE_MARGIN = 80
 
 # --- Rank definitions ---
 RANK_COLORS = {
-    "lions":   {"primary": (255, 199, 44),  "accent": (0, 63, 135),  "bg": (51, 40, 9),  "logo": "rank_lion.png"},
-    "tigers":  {"primary": (252, 106, 33),  "accent": (0, 63, 135),  "bg": (50, 21, 7),  "logo": "rank_tiger.png"},
-    "wolves":  {"primary": (188, 208, 54),  "accent": (0, 63, 135),  "bg": (30, 33, 9),  "logo": "rank_wolf.png"},
-    "bears":   {"primary": (0, 174, 239),   "accent": (0, 63, 135),  "bg": (0, 28, 38),  "logo": "rank_bear.png"},
-    "webelos": {"primary": (0, 132, 61),    "accent": (0, 63, 135),  "bg": (0, 26, 12),  "logo": "rank_webelos.png"},
-    "aol":     {"primary": (0, 132, 61),    "accent": (0, 63, 135),  "bg": (0, 26, 12),  "logo": "rank_webelos.png"},
+    "lions":   {"primary": (255, 199, 44),  "accent": (0, 63, 135),  "bg": (51, 40, 9),  "bg_light": (255, 243, 214), "logo": "rank_lion.png"},
+    "tigers":  {"primary": (252, 106, 33),  "accent": (0, 63, 135),  "bg": (50, 21, 7),  "bg_light": (254, 234, 218), "logo": "rank_tiger.png"},
+    "wolves":  {"primary": (188, 208, 54),  "accent": (0, 63, 135),  "bg": (30, 33, 9),  "bg_light": (240, 245, 210), "logo": "rank_wolf.png"},
+    "bears":   {"primary": (0, 174, 239),   "accent": (0, 63, 135),  "bg": (0, 28, 38),  "bg_light": (214, 240, 252), "logo": "rank_bear.png"},
+    "webelos": {"primary": (0, 132, 61),    "accent": (0, 63, 135),  "bg": (0, 26, 12),  "bg_light": (214, 240, 224), "logo": "rank_webelos.png"},
+    "aol":     {"primary": (0, 132, 61),    "accent": (0, 63, 135),  "bg": (0, 26, 12),  "bg_light": (214, 240, 224), "logo": "rank_webelos.png"},
 }
 
 RANK_DISPLAY = {

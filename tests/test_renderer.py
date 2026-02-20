@@ -25,6 +25,18 @@ class TestGenerateScoutImage:
         result = generate_scout_image(sample_scout, images_dir)
         assert result.mode == "RGB"
 
+    def test_light_mode_dimensions(self, sample_scout, images_dir):
+        result = generate_scout_image(sample_scout, images_dir, light=True)
+        assert isinstance(result, Image.Image)
+        assert result.size == (1920, 1080)
+        assert result.mode == "RGB"
+
+    def test_light_mode_background_pixel(self, sample_scout, images_dir):
+        result = generate_scout_image(sample_scout, images_dir, light=True)
+        # Sample below the top color bar (BAR_HEIGHT=15) in the background area
+        pixel = result.getpixel((0, 20))
+        assert sum(pixel) > 600, f"Expected light background, got {pixel}"
+
     def test_all_ranks_render(self, images_dir):
         """Every rank produces a valid image without errors."""
         from scout_awards.config import RANK_ORDER

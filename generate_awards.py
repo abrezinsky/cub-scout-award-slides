@@ -34,6 +34,10 @@ def parse_args():
         "-p", "--pptx", metavar="FILE",
         help="also generate a PowerPoint presentation with all slides",
     )
+    parser.add_argument(
+        "--light", action="store_true",
+        help="use light-colored backgrounds with dark text",
+    )
     return parser.parse_args()
 
 
@@ -82,7 +86,7 @@ def main():
     sorted_scouts = sort_scouts(scouts)
 
     for scout in sorted_scouts:
-        img = generate_scout_image(scout, images_dir)
+        img = generate_scout_image(scout, images_dir, light=args.light)
         filename = f"{scout['den_type']}_{scout['last']}_{scout['first']}.png"
         out_path = os.path.join(output_dir, filename)
         img.save(out_path)
@@ -96,7 +100,7 @@ def main():
         if not os.path.isabs(pptx_path):
             pptx_path = os.path.join(os.getcwd(), pptx_path)
         print(f"Generating PowerPoint: {pptx_path}...")
-        generate_pptx(pptx_path, sorted_scouts, images_dir)
+        generate_pptx(pptx_path, sorted_scouts, images_dir, light=args.light)
         print(f"  {len(sorted_scouts)} slides written.")
 
 
